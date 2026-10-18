@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leakachu | Smart Campus Water Grievance & Reporter</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #f8fafc; color: #1e293b; padding: 20px; line-height: 1.5; }
+    .container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    
+    /* Header with custom logo */
+    header { 
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); 
+      color: white; 
+      padding: 16px 20px; 
+      border-radius: 14px; 
+      display: flex; 
+      align-items: center; 
+      gap: 16px; 
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15); 
+    }
+    .logo-img { 
+      width: 84px; 
+      height: 84px; 
+      border-radius: 12px; 
+      object-fit: cover; 
+      background: #e0f2fe; 
+      padding: 2px; 
+      border: 2px solid rgba(255, 255, 255, 0.5); 
+      flex-shrink: 0; 
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
+    }
+    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+    .tag { 
+      background: #facc15; 
+      color: #713f12; 
+      font-size: 0.72rem; 
+      font-weight: 800; 
+      padding: 3px 10px; 
+      border-radius: 20px; 
+    }
+    header h1 { font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
+    header p { opacity: 0.92; font-size: 0.85rem; }
+
+    /* Slots */
+    .slot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .nav-card { 
+      background: #ffffff; 
+      border: 2px solid #e2e8f0; 
+      border-radius: 12px; 
+      padding: 24px 16px; 
+      text-align: center; 
+      cursor: pointer; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 10px; 
+      transition: all 0.2s ease; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .nav-card:hover { border-color: #0284c7; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(2, 132, 199, 0.12); }
+    .slot-icon { font-size: 2.2rem; }
+    .nav-card h3 { font-size: 1.2rem; font-weight: 700; color: #0f172a; }
+    .nav-card p { font-size: 0.82rem; color: #64748b; }
+
+    /* Views */
+    .view-section { display: none; }
+    .view-section.active { display: block; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card { background: #ffffff; border-radius: 12px; padding: 22px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; }
+    .top-bar h2 { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
+    .btn-back { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: 0.15s; }
+    .btn-back:hover { background: #e2e8f0; color: #0f172a; }
+    
+    /* Form */
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #334155; }
+    select, input[type="text"] { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background-color: #ffffff; color: #1e293b; transition: border-color 0.15s; }
+    select:focus, input[type="text"]:focus { outline: none; border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
+    
+    /* Image Upload Section / Grievance Photo */
+    .upload-zone {
+      border: 2px dashed #93c5fd;
+      border-radius: 8px;
+      background: #f0f9ff;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: #0284c7;
+      background: #e0f2fe;
+    }
+    .upload-prompt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .preview-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #bae6fd;
+    }
+    .preview-img {
+      width: 58px;
+      height: 58px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+    }
+    .preview-info {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .file-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #334155;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn-remove-img {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.15s;
+    }
+    .btn-remove-img:hover {
+      background: #fecaca;
+    }
+
+    .btn-submit { width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+    .btn-submit:hover { background: #0369a1; }
+    .btn-submit:active { transform: scale(0.99); }
+
+    /* History & Stats */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .stat-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; text-align: center; }
+    .stat-num { font-size: 1.5rem; font-weight: 700; color: #0284c7; }
+    .stat-lbl { font-size: 0.78rem; color: #64748b; font-weight: 500; }
+
+    .ticket-list { list-style: none; }
+    .ticket-item { 
+      padding: 14px; 
+      border-left: 4px solid #0284c7; 
+      background: #f8fafc; 
+      margin-bottom: 12px; 
+      border-radius: 0 8px 8px 0; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      gap: 12px; 
+      border-top: 1px solid #f1f5f9;
+      border-right: 1px solid #f1f5f9;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.2s;
+    }
+    .ticket-item.high { border-left-color: #ef4444; }
+    .ticket-item.resolved { border-left-color: #10b981; background: #f0fdf4; opacity: 0.9; }
+    .ticket-item.resolved .ticket-details { text-decoration: line-through; color: #94a3b8; }
+    .ticket-content { flex: 1; min-width: 0; }
+    .ticket-header { font-weight: 600; font-size: 0.92rem; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ticket-details { font-size: 0.82rem; color: #475569; }
+    
+    /* Photo thumbnail in ticket */
+    .ticket-photo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      padding: 3px 8px 3px 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .ticket-photo-badge:hover {
+      border-color: #0284c7;
+      background: #f0f9ff;
+    }
+    .ticket-photo-thumb {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      object-fit: cover;
+    }
+    .ticket-photo-text {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #0369a1;
+    }
+
+    .badge { font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 600; }
+    .badge.critical { background: #fee2e2; color: #991b1b; }
+    .badge.standard { background: #e0f2fe; color: #075985; }
+    .badge.fixed { background: #dcfce7; color: #166534; }
+    .btn-resolve { padding: 8px 12px; font-size: 0.78rem; font-weight: 700; color: #0369a1; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 6px; cursor: pointer; white-space: nowrap; transition: 0.15s; }
+    .btn-resolve:hover { background: #bae6fd; }
+    .btn-resolve:disabled { background: #dcfce7; color: #15803d; border-color: #bbf7d0; cursor: default; }
+
+    /* Modal for viewing uploaded image */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.75);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-box {
+      background: white;
+      border-radius: 12px;
+      max-width: 520px;
+      width: 100%;
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+    }
+    .modal-header {
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+    .modal-header h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      color: #64748b;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .modal-close-btn:hover {
+      color: #0f172a;
+      background: #e2e8f0;
+    }
+    .modal-img-wrap {
+      padding: 12px;
+      background: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      max-height: 70vh;
+      overflow: hidden;
+    }
+    .modal-img {
+      max-width: 100%;
+      max-height: 65vh;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 600px) {
+      .slot-grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; text-align: center; }
+      .brand { justify-content: center; }
+      .ticket-item { flex-direction: column; align-items: flex-start; }
+      .btn-resolve { align-self: flex-end; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <!-- Custom Leakachu Logo -->
+    <img src="https://i.postimg.cc/d1XHGm0N/logo.jpg" alt="Leakachu Logo" class="logo-img">
+    <div>
+      <div class="brand">
+        <h1>Leakachu</h1>
+        <span class="tag">when its giving infrastructure failure</span>
+      </div>
+      <p>CIV104 Assignment | Smart Campus Water Monitoring Desk</p>
+    </div>
+  </header>
+
+  <!-- Navigation Slots -->
+  <div id="homeView" class="view-section active">
+    <div class="slot-grid">
+      <div class="nav-card" onclick="switchView('reportView')">
+        <div class="slot-icon">💧</div>
+        <h3>Report Grievance</h3>
+        <p>File a quick 10-second alert or upload photo proof for a water leak.</p>
+      </div>
+      <div class="nav-card" onclick="switchView('historyView')">
+        <div class="slot-icon">📜</div>
+        <h3>Incident History</h3>
+        <p>Check active tickets, resolve leaks, and view water saved.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- View 1: Report / Grievance Portal -->
+  <div id="reportView" class="view-section">
+    <div class="card">
+      <div class="top-bar">
+        <h2>Report an Issue (Grievance Portal)</h2>
+        <button class="btn-back" onclick="switchView('homeView')">&larr; Back</button>
+      </div>
+      <form id="reportForm">
+        <div class="form-group">
+          <label for="location">Location / Block</label>
+          <select id="location" required>
+            <option value="">Select Location</option>
+            <option value="F Block - NSSKC Lab Area">F Block - NSSKC Lab Area</option>
+            <option value="Main Academic Block - Restroom 1F">Main Academic Block - Restroom 1F</option>
+            <option value="Cafeteria Handwash Area">Cafeteria Handwash Area</option>
+            <option value="Garden Overhead Supply Line">Garden Overhead Supply Line</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="issue">Grievance / Detected Malfunction</label>
+          <select id="issue" required>
+            <option value="Continuous Tap Drip">Continuous Tap Drip (~15 L/day)</option>
+            <option value="Stuck Flush Valve">Stuck Flush Valve (~500 L/day)</option>
+            <option value="Overhead Tank Overflow">Overhead Tank Overflow (~1200 L/hr)</option>
+            <option value="Exposed Pipe Joint Seepage">Exposed Pipe Joint Seepage (~50 L/day)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="severity">Urgency Level</label>
+          <select id="severity">
+            <option value="Standard">Standard (Slow drip)</option>
+            <option value="Critical">Critical (Continuous overflow)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="reporter">Reported By</label>
+          <select id="reporter" required>
+            <option value="">Select Role</option>
+            <option value="Student">Student</option>
+            <option value="Staff">Staff</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <!-- Image Upload Section / Grievance Photo Evidence -->
+        <div class="form-group">
+          <label>Upload Grievance Image / Evidence <span style="font-weight: 400; color: #64748b;">(Optional)</span></label>
+          <div class="upload-zone" id="uploadDropZone" onclick="document.getElementById('grievanceImageInput').click()">
+            <input type="file" id="grievanceImageInput" accept="image/*" style="display: none;">
+            <div class="upload-prompt" id="uploadPrompt">
+              <div style="font-size: 1.8rem; margin-bottom: 4px;">📷</div>
+              <div style="font-weight: 600; font-size: 0.9rem; color: #0284c7;">Click or drag &amp; drop photo here</div>
+              <div style="font-size: 0.75rem; color: #64748b;">PNG, JPG, or WEBP photo of leak/issue</div>
+            </div>
+            <div class="preview-box" id="previewBox" style="display: none;">
+              <img id="imagePreview" src="" alt="Grievance Preview" class="preview-img">
+              <div class="preview-info">
+                <span id="fileName" class="file-name"></span>
+                <button type="button" class="btn-remove-img" id="removeImgBtn" onclick="event.stopPropagation(); removeUploadedImage();">&times; Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Submit Report</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- View 2: History -->
+  <div id="historyView" class="view-section">
+    <div class="card">
+      <div class="top-bar">
+        <h2>Incident History &amp; Impact</h2>
+        <button class="btn-back" onclick="switchView('homeView')">&larr; Back</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-num" id="activeCount">2</div>
+          <div class="stat-lbl">Active Leaks Tracked</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="savedLitres">2,250 L</div>
+          <div class="stat-lbl">Est. Water Saved</div>
+        </div>
+      </div>
+
+      <ul class="ticket-list" id="ticketList">
+        <li class="ticket-item high" id="ticket-1">
+          <div class="ticket-content">
+            <div class="ticket-header">
+              <span>F Block - NSSKC Lab Area</span>
+              <span class="badge critical">Critical</span>
+            </div>
+            <div class="ticket-details">Overhead Tank Overflow &bull; Reported by Staff (12m ago)</div>
+          </div>
+          <button class="btn-resolve" onclick="resolveTicket('ticket-1')">Mark Fixed</button>
+        </li>
+
+        <li class="ticket-item" id="ticket-2">
+          <div class="ticket-content">
+            <div class="ticket-header">
+              <span>Cafeteria Handwash Area</span>
+              <span class="badge standard">Standard</span>
+            </div>
+            <div class="ticket-details">Continuous Tap Drip &bull; Reported by Student (45m ago)</div>
+          </div>
+          <button class="btn-resolve" onclick="resolveTicket('ticket-2')">Mark Fixed</button>
+        </li>
+
+        <li class="ticket-item resolved" id="ticket-3">
+          <div class="ticket-content">
+            <div class="ticket-header">
+              <span>Main Academic Block - Restroom 1F</span>
+              <span class="badge fixed">Fixed ✅</span>
+            </div>
+            <div class="ticket-details">Stuck Flush Valve &bull; Reported by Student (Resolved 2 hrs ago)</div>
+          </div>
+          <button class="btn-resolve" disabled>Resolved</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Dialog to View Uploaded Grievance Photo -->
+<div id="imageModal" class="modal-overlay" onclick="closeImageModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h4>Grievance Photo Evidence</h4>
+      <button class="modal-close-btn" onclick="closeImageModal()">&times;</button>
+    </div>
+    <div class="modal-img-wrap">
+      <img id="modalImgDisplay" src="" alt="Enlarged grievance photo" class="modal-img">
+    </div>
+  </div>
+</div>
+
+<script>
+  let activeReports = 2;
+  let waterSaved = 2250;
+  let ticketCounter = 4;
+  let currentUploadedImage = null;
+
+  function switchView(viewId) {
+    document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+  }
+
+  function resolveTicket(ticketId) {
+    const item = document.getElementById(ticketId);
+    if (!item || item.classList.contains('resolved')) return;
+
+    item.classList.remove('high');
+    item.classList.add('resolved');
+
+    const badge = item.querySelector('.badge');
+    badge.className = 'badge fixed';
+    badge.innerText = 'Fixed ✅';
+
+    const btn = item.querySelector('.btn-resolve');
+    btn.innerText = 'Resolved';
+    btn.disabled = true;
+
+    if (activeReports > 0) {
+      activeReports--;
+      document.getElementById('activeCount').innerText = activeReports;
+    }
+  }
+
+  // Image Upload Handling
+  const fileInput = document.getElementById('grievanceImageInput');
+  const dropZone = document.getElementById('uploadDropZone');
+  const uploadPrompt = document.getElementById('uploadPrompt');
+  const previewBox = document.getElementById('previewBox');
+  const previewImg = document.getElementById('imagePreview');
+  const fileNameDisplay = document.getElementById('fileName');
+
+  fileInput.addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+      handleImageFile(e.target.files[0]);
+    }
+  });
+
+  dropZone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+
+  dropZone.addEventListener('dragleave', function() {
+    dropZone.classList.remove('dragover');
+  });
+
+  dropZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleImageFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  function handleImageFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      currentUploadedImage = evt.target.result;
+      previewImg.src = currentUploadedImage;
+      fileNameDisplay.textContent = file.name;
+      uploadPrompt.style.display = 'none';
+      previewBox.style.display = 'flex';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeUploadedImage() {
+    currentUploadedImage = null;
+    fileInput.value = '';
+    previewImg.src = '';
+    fileNameDisplay.textContent = '';
+    previewBox.style.display = 'none';
+    uploadPrompt.style.display = 'flex';
+  }
+
+  function viewModalImage(imgSrc) {
+    document.getElementById('modalImgDisplay').src = imgSrc;
+    document.getElementById('imageModal').classList.add('active');
+  }
+
+  function closeImageModal() {
+    document.getElementById('imageModal').classList.remove('active');
+    document.getElementById('modalImgDisplay').src = '';
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeImageModal();
+    }
+  });
+
+  document.getElementById('reportForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const location = document.getElementById('location').value;
+    const issue = document.getElementById('issue').value;
+    const severity = document.getElementById('severity').value;
+    const reporter = document.getElementById('reporter').value;
+
+    const newId = `ticket-${ticketCounter++}`;
+    const isCritical = severity === 'Critical';
+
+    const list = document.getElementById('ticketList');
+    const item = document.createElement('li');
+    item.className = 'ticket-item' + (isCritical ? ' high' : '');
+    item.id = newId;
+
+    let photoHtml = '';
+    if (currentUploadedImage) {
+      photoHtml = `
+        <div class="ticket-photo-badge" onclick="viewModalImage('${currentUploadedImage}')">
+          <img src="${currentUploadedImage}" alt="Proof" class="ticket-photo-thumb">
+          <span class="ticket-photo-text">📷 View Evidence Photo</span>
+        </div>
+      `;
+    }
+
+    item.innerHTML = `
+      <div class="ticket-content">
+        <div class="ticket-header">
+          <span>${location}</span>
+          <span class="badge ${isCritical ? 'critical' : 'standard'}">${severity}</span>
+        </div>
+        <div class="ticket-details">${issue} &bull; Reported by ${reporter} (Just now)</div>
+        ${photoHtml}
+      </div>
+      <button class="btn-resolve" onclick="resolveTicket('${newId}')">Mark Fixed</button>
+    `;
+
+    list.prepend(item);
+
+    activeReports++;
+    waterSaved += isCritical ? 300 : 50;
+
+    document.getElementById('activeCount').innerText = activeReports;
+    document.getElementById('savedLitres').innerText = waterSaved.toLocaleString() + ' L';
+
+    removeUploadedImage();
+    this.reset();
+    switchView('historyView');
+  });
+</script>
+
+</body>
+</html>
